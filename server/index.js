@@ -1,3 +1,4 @@
+import path from 'path'
 import express from 'express'
 import cors from 'cors'
 import fetch from 'node-fetch'
@@ -7,16 +8,25 @@ const app = express()
 app.use(cors({ origin: true }))
 app.use(express.json({ limit: '1mb' }))
 
+const PORT = process.env.PORT || 3000
 const TARGET = process.env.VITE_API_BASE_URL || 'https://web-production-1d7f9.up.railway.app'
 
 // Proxy semua route /api ke backend Railway saat development
 app.use('/api', createProxyMiddleware({
   target: TARGET,
   changeOrigin: true,
-  pathRewrite: {
-    '^/api': '/api'
-  }
+  secure: true,
+  logLevel: 'warn'
 }))
+
+// Serve static built files
+const staticPath = path.join(__dirname, '..', 'dist')
+app.use(express.static(staticPath))
+
+// SPA fallback
+app.get('*', (req, res) => {
+  res.sendFile(path.join(staticPath, 'index.html'))
+})
 
 app.get('/health', (req, res) => {
   res.json({ ok: true, ts: Date.now() })
@@ -77,5 +87,7 @@ app.post('/meal-assistant', async (req, res) => {
   }
 })
 
-const port = process.env.PORT || 8787
-app.listen(port, () => console.log(`Meal Assistant API listening on http://localhost:${port}`))
+app.listen(PORT, () => {
+  console.log(`Frontend server listening on http://localhost:${PORT}`)
+  console.log(`Proxying /api -> ${TARGET}`)
+})
