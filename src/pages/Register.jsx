@@ -11,7 +11,6 @@ const Register = () => {
     username: '',
     email: '',
     password: '',
-    confirmPassword: '',
     full_name: '',
     role: 'trainee', // Default role trainee
   });
