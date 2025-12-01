@@ -7,12 +7,12 @@ const Register = () => {
   const navigate = useNavigate();
   const { register, loading } = useAuth();
 
-  const [formData, setFormData] = useState({
+  const [form, setForm] = useState({
     username: '',
     email: '',
     password: '',
-    full_name: '',
-    role: 'trainee', // Default role trainee
+    role: 'trainee',
+    full_name: ''
   });
 
   const [errors, setErrors] = useState({});
@@ -20,7 +20,7 @@ const Register = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setForm((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -38,40 +38,40 @@ const Register = () => {
     const newErrors = {};
 
     // Username validation
-    if (!formData.username.trim()) {
+    if (!form.username.trim()) {
       newErrors.username = 'Username is required';
-    } else if (formData.username.length < 3) {
+    } else if (form.username.length < 3) {
       newErrors.username = 'Username must be at least 3 characters';
     }
 
     // Email validation
-    if (!formData.email.trim()) {
+    if (!form.email.trim()) {
       newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
       newErrors.email = 'Email is invalid';
     }
 
     // Password validation
-    if (!formData.password) {
+    if (!form.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
+    } else if (form.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
 
     // Confirm password validation
-    if (!formData.confirmPassword) {
+    if (!form.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password';
-    } else if (formData.password !== formData.confirmPassword) {
+    } else if (form.password !== form.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
 
     // Full name validation
-    if (!formData.full_name.trim()) {
+    if (!form.full_name.trim()) {
       newErrors.full_name = 'Full name is required';
     }
 
     // Role validation
-    if (!formData.role) {
+    if (!form.role) {
       newErrors.role = 'Please select a role';
     }
 
@@ -90,18 +90,18 @@ const Register = () => {
     }
 
     try {
-      console.log('📝 Submitting registration with role:', formData.role);
+      console.log('📝 Submitting registration with role:', form.role);
       
       // Prepare data for API (remove confirmPassword)
-      const { confirmPassword, ...registerData } = formData;
+      const { confirmPassword, ...registerData } = form;
 
       // Call register function from AuthContext
       await register(registerData);
 
-      console.log('✅ Registration successful for role:', formData.role);
+      console.log('✅ Registration successful for role:', form.role);
 
       // Redirect based on role
-      if (formData.role === 'coach') {
+      if (form.role === 'coach') {
         navigate('/coach/dashboard');
       } else {
         navigate('/trainee/dashboard');
@@ -141,7 +141,7 @@ const Register = () => {
               <input
                 type="text"
                 name="username"
-                value={formData.username}
+                value={form.username}
                 onChange={handleChange}
                 className="w-full bg-blue-900/30 border border-blue-700 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 outline-none transition"
                 placeholder="johndoe"
@@ -155,7 +155,7 @@ const Register = () => {
               <input
                 type="text"
                 name="full_name"
-                value={formData.full_name}
+                value={form.full_name}
                 onChange={handleChange}
                 className="w-full bg-blue-900/30 border border-blue-700 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 outline-none transition"
                 placeholder="John Doe"
@@ -169,7 +169,7 @@ const Register = () => {
               <input
                 type="email"
                 name="email"
-                value={formData.email}
+                value={form.email}
                 onChange={handleChange}
                 className="w-full bg-blue-900/30 border border-blue-700 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 outline-none transition"
                 placeholder="john@example.com"
@@ -183,7 +183,7 @@ const Register = () => {
               <input
                 type="password"
                 name="password"
-                value={formData.password}
+                value={form.password}
                 onChange={handleChange}
                 className="w-full bg-blue-900/30 border border-blue-700 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 outline-none transition"
                 placeholder="••••••••"
@@ -197,7 +197,7 @@ const Register = () => {
               <input
                 type="password"
                 name="confirmPassword"
-                value={formData.confirmPassword}
+                value={form.confirmPassword}
                 onChange={handleChange}
                 className="w-full bg-blue-900/30 border border-blue-700 rounded-lg px-4 py-3 text-white placeholder-white/40 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 outline-none transition"
                 placeholder="••••••••"
@@ -211,9 +211,9 @@ const Register = () => {
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
-                  onClick={() => setFormData((prev) => ({ ...prev, role: 'coach' }))}
+                  onClick={() => setForm((prev) => ({ ...prev, role: 'coach' }))}
                   className={`p-4 rounded-lg border-2 transition-all ${
-                    formData.role === 'coach'
+                    form.role === 'coach'
                       ? 'bg-yellow-400 border-yellow-400 text-blue-900'
                       : 'bg-blue-900/30 border-blue-700 text-white hover:border-yellow-400'
                   }`}
@@ -223,9 +223,9 @@ const Register = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setFormData((prev) => ({ ...prev, role: 'trainee' }))}
+                  onClick={() => setForm((prev) => ({ ...prev, role: 'trainee' }))}
                   className={`p-4 rounded-lg border-2 transition-all ${
-                    formData.role === 'trainee'
+                    form.role === 'trainee'
                       ? 'bg-yellow-400 border-yellow-400 text-blue-900'
                       : 'bg-blue-900/30 border-blue-700 text-white hover:border-yellow-400'
                   }`}
